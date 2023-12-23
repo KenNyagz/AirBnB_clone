@@ -1,6 +1,12 @@
 .places { display: flex;
+          text-align: left;
+          vertical-align: top;
           flex-wrap: wrap;
           justify-content: center;
+}
+
+h1 { margin-left: 100px; 
+     text-indent: 10%;
 }
 
 .place-container { position: relative; }
@@ -12,6 +18,7 @@
 .places article { margic: 20px;}
 
 .places h1 { font-size: 30px;
+             margin-left: 30px;
              justify-content: center;
              text-align: center;
              
