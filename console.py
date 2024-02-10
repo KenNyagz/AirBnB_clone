@@ -124,11 +124,13 @@ class HBNBCommand(cmd.Cmd):
             if lines[1].startswith("show(\""):
                 pattern = r'show\("([^"]+)"\)'
                 match = re.findall(pattern, lines[1])
-                match = match[0]
-                key = "{}.{}".format(lines[0], match)
+                obj_id = match[0].split(',')[0]
+                obj_id = obj_id.replace('"', '')
+                # print(obj_id)
+                key = "{}.{}".format(lines[0], obj_id)
                 for ky, obj in storage.all().items():
-                    if match == obj.id:
-                        print(obj)
+                    if ky == key:
+                        print(storage.all()[ky])
                         return
                 print("** no instance found **")
 
@@ -149,8 +151,24 @@ class HBNBCommand(cmd.Cmd):
 
             # update an instance based on it's ID
             if lines[1].startswith("update("):
-                parts = lines[1].strip("update(").rstrip(")").split(", ")
+                #update multiple attributes in an instance using a dict
+                if lines[1].split()[1].startswith("{"):
+                    _, args = line.split("(", 1) # Extract uuid from parsed str argmnt
+                    args = args.rsplit(")", 1)[0]
+                    uuid = args.split()[0].replace('"', "").replace("'", "").strip(",")
+                    key = "{}.{}".format(lines[0], uuid)
+                    #key = '"' + key + '"'
+                    pattern = r'{.*}' # regex pattern to use to extract dictio
+                    dictionary = re.search(pattern, args).group() #extract dict
+                    dictionary = eval(dictionary)
+                    keys_stored = list(storage.all().keys())
+                    if key in keys_stored:
+                        for k, val in dictionary.items():
+                            setattr(storage.all()[key], k, val)
+                    return
 
+                #Update an instance's attribute one at a time                
+                parts = lines[1].strip("update(").rstrip(")").split(", ")
                 if len(parts) == 3:
                     parts2 = []
                     for part in parts:
@@ -181,6 +199,7 @@ class HBNBCommand(cmd.Cmd):
 name>,<attribute value>) or\n"
 "Usage: <class name>.update(<id>, <dictionary\
 representation>)")
+                    return
                 
             # get all insts of a class, eg User.all().
             if line.endswith(".all()"):
