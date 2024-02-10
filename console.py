@@ -117,6 +117,15 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line):
         """Called for any command not recognized by other 'do_*' """
+        class_mapping = {
+         'BaseModel': BaseModel,
+         'User': User,
+         'Place': Place,
+         'State': State,
+         'Review': Review,
+         'City': City,
+         'Amenity': Amenity,
+         }
         lines = line.split('.')
         if len(lines) > 1:
 
@@ -155,6 +164,9 @@ class HBNBCommand(cmd.Cmd):
                 if lines[1].split()[1].startswith("{"):
                     _, args = line.split("(", 1) # Extract uuid from parsed str argmnt
                     args = args.rsplit(")", 1)[0]
+                    if lines[0] not in class_mapping:
+                        print("** class doesn't exist **")
+                        return
                     uuid = args.split()[0].replace('"', "").replace("'", "").strip(",")
                     key = "{}.{}".format(lines[0], uuid)
                     #key = '"' + key + '"'
